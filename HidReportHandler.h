@@ -1,6 +1,11 @@
 #ifndef HidReportHandlerH
 #define HidReportHandlerH
 
-void ProcessReceivedReport(unsigned char* buffer, int size);
+namespace nsHidDevice
+{
+    class HidDevice;
+}
+
+void ProcessReceivedReport(nsHidDevice::HidDevice &hidDevice, unsigned char* buffer, int size);
 
 #endif // HidReportHandlerH

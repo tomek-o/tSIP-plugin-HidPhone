@@ -58,10 +58,10 @@ DWORD WINAPI CommThreadProc(LPVOID data) {
             }
             else
             {
-                int size = sizeof(rcvbuf);
+                int size = hidDevice.GetReportInLength(); //sizeof(rcvbuf);
                 memset(rcvbuf, 0, sizeof(rcvbuf));
                 //LOG("%03d  devConnected: %d, size = %d", __LINE__, (int)devConnected, size);
-                int status = hidDevice.ReadReport(HidDevice::E_REPORT_IN, 0, rcvbuf, &size, 100);
+                int status = hidDevice.Read(rcvbuf, size, 100);
                 //LOG("%03d  devConnected: %d, size = %d", __LINE__, (int)devConnected, size);
                 if (status == 0) {
                     if (customSettings.logReceivedHidReports) {
@@ -73,7 +73,7 @@ DWORD WINAPI CommThreadProc(LPVOID data) {
                         }
                         LOG("HID REPORT_IN received %d B: %s", size, hex.c_str());
                     }
-                    ProcessReceivedReport(rcvbuf, size);
+                    ProcessReceivedReport(hidDevice, rcvbuf, size);
                 } else if (status != HidDevice::E_ERR_TIMEOUT) {
                     LOG("USB device: error reading report");
                     hidDevice.Close();

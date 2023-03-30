@@ -104,11 +104,12 @@ int ControlQueue::Poll(nsHidDevice::HidDevice &dev)
     if (cmd.updateRingState) {
         if (cmd.ringState != ringState) {
             ringState = cmd.ringState;
-            status = dev.WriteUsage(HID_USAGE_LED_RING, ringState);
-            if (status)
-                return status;
             if (!ringState  && callState) {
-                status = dev.WriteUsage(HID_USAGE_LED_OFF_HOOK, callState && !ringState);
+                status = dev.WriteUsage(HID_USAGE_LED_OFF_HOOK, callState);
+                if (status)
+                    return status;
+            } else {
+                status = dev.WriteUsage(HID_USAGE_LED_RING, ringState);
                 if (status)
                     return status;
             }

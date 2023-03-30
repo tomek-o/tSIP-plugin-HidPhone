@@ -51,10 +51,12 @@ using namespace nsHidDevice;
 using namespace std;
 
 #define HID_USAGE_TELEPHONY_HOOK_SWITCH 0x20
-#define HID_USAGE_TELEPHONY_MUTE        0x2F
-#define HID_USAGE_TELEPHONY_REDIAL      0x24
 #define HID_USAGE_TELEPHONY_FLASH       0x21
+#define HID_USAGE_TELEPHONY_HOLD        0x23
+#define HID_USAGE_TELEPHONY_REDIAL      0x24
+#define HID_USAGE_TELEPHONY_MUTE        0x2F    // microphone mute
 #define HID_USAGE_TELEPHONY_LINE_BUSY   0x97
+#define HID_USAGE_TELEPHONY_LED_RINGER  0x9E    //?
 
 HidDevice::SERROR HidDevice::tabErrorsName[E_ERR_LIMIT] =
 {
@@ -108,7 +110,9 @@ HidDevice::HidDevice(void):
         PID(0),
         usagePage(-1),
         preparsedData(NULL),
-        reportOutLength(0)
+        reportInLength(0),
+        reportOutLength(0),
+        offHookSetTimer(0)
 {
     pOverlapped = new OVERLAPPED;
     HidD_GetHidGuid(&hidGuid);
@@ -223,6 +227,7 @@ int HidDevice::Open(int VID, int PID, char *vendorName, char *productName, int u
             this->VID = deviceAttributes.VendorID;
             this->PID = deviceAttributes.ProductID;
 
+            reportInLength = Capabilities.InputReportByteLength;
             reportOutLength = Capabilities.OutputReportByteLength;
 
             HIDP_REPORT_TYPE reportTypes[] = { HidP_Input, HidP_Output };
@@ -246,18 +251,22 @@ int HidDevice::Open(int VID, int PID, char *vendorName, char *productName, int u
                                 bcTelephonyHookSwitch.valid = true;
                                 bcTelephonyHookSwitch.reportId = caps.ReportID;
                                 bcTelephonyHookSwitch.absolute = caps.IsAbsolute;
+                                LOG("Caps: USAGE_TELEPHONY_HOOK_SWITCH: reportId = %d, absolute = %d", caps.ReportID, caps.IsAbsolute);
                                 break;
                             case HID_USAGE_TELEPHONY_MUTE:
                                 bcTelephonyMute.valid = true;
                                 bcTelephonyMute.reportId = caps.ReportID;
                                 bcTelephonyMute.absolute = caps.IsAbsolute;
+                                LOG("Caps: USAGE_TELEPHONY_MUTE: reportId = %d, absolute = %d", caps.ReportID, caps.IsAbsolute);
                                 break;
                             case HID_USAGE_TELEPHONY_REDIAL:
                                 bcTelephonyRedial.valid = true;
                                 bcTelephonyRedial.reportId = caps.ReportID;
                                 bcTelephonyRedial.absolute = caps.IsAbsolute;
+                                LOG("Caps: USAGE_TELEPHONY_REDIAL: reportId = %d, absolute = %d", caps.ReportID, caps.IsAbsolute);
                                 break;
                             default:
+                                LOG("Caps: Unknown usage 0x%02X: reportId = %d, absolute = %d", usage, caps.ReportID, caps.IsAbsolute);
                                 break;
                             }
 
@@ -481,6 +490,8 @@ int HidDevice::WriteUsage(USAGE usage, bool state)
         if (!bcLedOffHook.valid)
             return 0;
         LOG("WriteUsage: OFFHOOK, %s", state?"true":"false");
+        if (state)
+            offHookSetTimer = 10;
         report[0] = bcLedOffHook.reportId;
         break;
     case HID_USAGE_LED_MUTE:
@@ -592,4 +603,87 @@ int HidDevice::ReadReport(enum E_REPORT_TYPE type, int id, unsigned char *buffer
     }
     return status == 0 ? E_ERR_IO : 0;
 }
+
+int HidDevice::Read(unsigned char *buffer, int &len, int timeout)
+{
+    BOOL status = 0;
+    DWORD bytesRead = 0;
+    DWORD result;
+
+    if (offHookSetTimer > 0)
+        offHookSetTimer--;
+
+    status = ReadFile(readHandle, buffer, len, &bytesRead, (LPOVERLAPPED)pOverlapped);
+    if( !status )
+    {
+        if( GetLastError() == ERROR_IO_PENDING )
+        {
+            result = WaitForSingleObject(hEventObject, timeout);
+            switch (result)
+            {
+            case WAIT_OBJECT_0:
+                //*len = bytesRead;
+                ResetEvent(hEventObject);
+                return 0;
+            case WAIT_TIMEOUT:
+                result = CancelIo(readHandle);
+                ResetEvent(hEventObject);
+                return E_ERR_TIMEOUT;
+            default:
+                ResetEvent(hEventObject);
+                return E_ERR_IO;
+            }
+        } else {
+            return E_ERR_IO;
+        }
+    }
+    else
+    {
+        len = bytesRead;
+        return 0;
+    }
+}
+
+int HidDevice::ParseReceivedReport(unsigned char* buffer, int len, bool &offHook, bool &mute, bool &redial, bool &lineBusy)
+{
+    offHook = false;
+    mute = false;
+    redial = false;
+    lineBusy = false;
+
+	USAGE usageList[16];
+	ULONG usageCount = sizeof(usageList)/sizeof(usageList[0]);
+    NTSTATUS status = HidP_GetUsages(HidP_Input, usagePage, 0, usageList, &usageCount, preparsedData, (PCHAR)buffer, len);
+    if (status != HIDP_STATUS_SUCCESS) {
+        LOG("HidP_GetUsages: error 0x%04x", status);
+        return status;
+    } else {
+        LOG("Received %u usage(s)", usageCount);
+    }
+
+    for (unsigned int i=0; i<usageCount; i++)
+    {
+        switch (usageList[i])
+        {
+        case HID_USAGE_TELEPHONY_HOOK_SWITCH:
+            offHook = true;
+            break;
+        case HID_USAGE_TELEPHONY_MUTE:
+            mute = true;
+            break;
+        case HID_USAGE_TELEPHONY_REDIAL:
+            redial = true;
+            break;
+        case HID_USAGE_TELEPHONY_LINE_BUSY:
+            lineBusy = true;
+            break;
+        default:
+            LOG("Received unhandled usage = %d", static_cast<int>(usageList[i]));
+            break;
+        }
+    }
+
+    return 0;
+}
+
 

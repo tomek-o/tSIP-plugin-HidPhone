@@ -36,7 +36,9 @@ namespace nsHidDevice {
         std::string path;
         int usagePage;
         PHIDP_PREPARSED_DATA preparsedData;
+        unsigned long reportInLength;
         unsigned long reportOutLength;
+        unsigned int offHookSetTimer; ///< Jabra Evolve 65 sends back offhook when it receives offhook, generating false button event
 
         struct ButtonCapEntry {
             bool valid;
@@ -123,6 +125,8 @@ namespace nsHidDevice {
         */
         int ReadReport(enum E_REPORT_TYPE type, int id, unsigned char *buffer, int *len, int timeout);
 
+        int Read(unsigned char *buffer, int &len, int timeout);
+
         /** \brief Close connection to device
         */
         void Close(void);
@@ -137,6 +141,16 @@ namespace nsHidDevice {
 
         int GetUsagePage(void) const {
             return usagePage;
+        }
+
+        unsigned long GetReportInLength(void) const {
+            return reportInLength;
+        }
+
+        int ParseReceivedReport(unsigned char* buffer, int len, bool &offHook, bool &mute, bool &redial, bool &lineBusy);
+
+        unsigned int GetOffHookSetTimer(void) const {
+            return offHookSetTimer;
         }
     };
 
