@@ -134,7 +134,7 @@ HidDevice::~HidDevice(void)
     Close();
 }
 
-void HidDevice::GetHidGuid(GUID *guid)
+void HidDevice::GetHidGuid(GUID *guid) const
 {
     *guid = hidGuid;
 }

@@ -20,7 +20,7 @@ class CustomSettings
 public:
     CustomSettings(void);
     void fromJson(const Json::Value &jv);
-    void toJson(Json::Value &jv);
+    void toJson(Json::Value &jv) const;
 
     unsigned int usbVid;
     unsigned int usbPid;

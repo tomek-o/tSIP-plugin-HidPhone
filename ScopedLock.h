@@ -5,7 +5,7 @@
 template <class M> class ScopedLock
 {
 public:
-	ScopedLock(M& mutex): m_mutex(mutex) {
+	explicit ScopedLock(M& mutex): m_mutex(mutex) {
 		//OutputDebugString("lock");
 		m_mutex.lock();
 	}

@@ -82,7 +82,7 @@ void CustomSettings::fromJson(const Json::Value &jv)
     jv.getString("scriptOffHook", scriptOffHook);
 }
 
-void CustomSettings::toJson(Json::Value &jv)
+void CustomSettings::toJson(Json::Value &jv) const
 {
     jv["usbVid"] = usbVid;
     jv["usbPid"] = usbPid;

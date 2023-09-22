@@ -86,12 +86,12 @@ namespace nsHidDevice {
         HidDevice(void);
         ~HidDevice(void);
 
-        void GetHidGuid(GUID *guid);
-        HANDLE GetHandle(void) {
+        void GetHidGuid(GUID *guid) const;
+        HANDLE GetHandle(void) const {
             return handle;
         }
 
-        std::string GetPath(void) {
+        std::string GetPath(void) const {
             return path;
         }
 
