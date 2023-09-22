@@ -116,6 +116,13 @@ HidDevice::HidDevice(void):
 {
     pOverlapped = new OVERLAPPED;
     HidD_GetHidGuid(&hidGuid);
+
+#if 0
+    // crash test
+    int *test = NULL;
+    *test = 1;
+    (void)test;
+#endif
 }
 
 HidDevice::~HidDevice(void)
@@ -335,6 +342,7 @@ int HidDevice::CreateReadWriteHandles(std::string path)
         0,
         NULL);
     if (writeHandle == INVALID_HANDLE_VALUE) {
+        LOG("Failed to create write handle!");
         return E_ERR_IO;
     }
 	readHandle = CreateFile	(path.c_str(), GENERIC_READ,
@@ -344,6 +352,7 @@ int HidDevice::CreateReadWriteHandles(std::string path)
 		FILE_FLAG_OVERLAPPED,
 		NULL);
     if (readHandle == INVALID_HANDLE_VALUE) {
+        LOG("Failed to create read handle!");
         return E_ERR_IO;
     }
 
@@ -354,8 +363,10 @@ int HidDevice::CreateReadWriteHandles(std::string path)
 			TRUE,   // manual reset (call ResetEvent)
 			TRUE,   // initial state = signaled
 			"");    // name
-        if (hEventObject == NULL)
+        if (hEventObject == NULL) {
+            LOG("Failed to create event handle!");
             return E_ERR_OTHER;
+        }
         ((OVERLAPPED*)pOverlapped)->hEvent = hEventObject;
         ((OVERLAPPED*)pOverlapped)->Offset = 0;
         ((OVERLAPPED*)pOverlapped)->OffsetHigh = 0;
@@ -373,8 +384,10 @@ int HidDevice::DumpCapabilities(std::string &dump)
         return E_ERR_IO;
 
     HIDP_CAPS Capabilities;
-    if (HidP_GetCaps(PreparsedData, &Capabilities) != HIDP_STATUS_SUCCESS)
+    if (HidP_GetCaps(PreparsedData, &Capabilities) != HIDP_STATUS_SUCCESS) {
+        LOG("HidP_GetCaps failed!");
         return E_ERR_IO;
+    }
 
     std::stringstream stream;
     stream << "Usage Page: 0x" << hex << Capabilities.UsagePage << endl;
