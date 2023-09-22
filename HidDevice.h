@@ -53,7 +53,7 @@ namespace nsHidDevice {
 
         int CreateReadWriteHandles(std::string path);
 
-        HidDevice(const HidDevice& source) {};
+        HidDevice(const HidDevice& source);
         HidDevice& operator=(const HidDevice&);
         static void UnicodeToAscii(char *buffer);
 
