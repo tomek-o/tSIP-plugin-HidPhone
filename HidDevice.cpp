@@ -390,21 +390,20 @@ int HidDevice::DumpCapabilities(std::string &dump)
     }
 
     std::stringstream stream;
-    stream << "Usage Page: 0x" << hex << Capabilities.UsagePage << endl;
-    stream << dec;
-    stream << "Input Report Byte Length: " << Capabilities.InputReportByteLength << endl;
-    stream << "Output Report Byte Length: " << Capabilities.OutputReportByteLength << endl;
-    stream << "Feature Report Byte Length: " << Capabilities.FeatureReportByteLength << endl;
-    stream << "Number of Link Collection Nodes: " << Capabilities.NumberLinkCollectionNodes << endl;
-    stream << "Number of Input Button Caps: " << Capabilities.NumberInputButtonCaps << endl;
-    stream << "Number of InputValue Caps: " << Capabilities.NumberInputValueCaps << endl;
-    stream << "Number of InputData Indices: " << Capabilities.NumberInputDataIndices << endl;
-    stream << "Number of Output Button Caps: " << Capabilities.NumberOutputButtonCaps << endl;
-    stream << "Number of Output Value Caps: " << Capabilities.NumberOutputValueCaps << endl;
-    stream << "Number of Output Data Indices: " << Capabilities.NumberOutputDataIndices << endl;
-    stream << "Number of Feature Button Caps: " << Capabilities.NumberFeatureButtonCaps << endl;
-    stream << "Number of Feature Value Caps: " << Capabilities.NumberFeatureValueCaps << endl;
-    stream << "Number of Feature Data Indices: " << Capabilities.NumberFeatureDataIndices << endl;
+    stream << "    Usage Page: 0x" << hex << Capabilities.UsagePage << endl;
+    stream << "    Input Report Byte Length: " << Capabilities.InputReportByteLength << endl;
+    stream << "    Output Report Byte Length: " << Capabilities.OutputReportByteLength << endl;
+    stream << "    Feature Report Byte Length: " << Capabilities.FeatureReportByteLength << endl;
+    stream << "    Number of Link Collection Nodes: " << Capabilities.NumberLinkCollectionNodes << endl;
+    stream << "    Number of Input Button Caps: " << Capabilities.NumberInputButtonCaps << endl;
+    stream << "    Number of InputValue Caps: " << Capabilities.NumberInputValueCaps << endl;
+    stream << "    Number of InputData Indices: " << Capabilities.NumberInputDataIndices << endl;
+    stream << "    Number of Output Button Caps: " << Capabilities.NumberOutputButtonCaps << endl;
+    stream << "    Number of Output Value Caps: " << Capabilities.NumberOutputValueCaps << endl;
+    stream << "    Number of Output Data Indices: " << Capabilities.NumberOutputDataIndices << endl;
+    stream << "    Number of Feature Button Caps: " << Capabilities.NumberFeatureButtonCaps << endl;
+    stream << "    Number of Feature Value Caps: " << Capabilities.NumberFeatureValueCaps << endl;
+    stream << "    Number of Feature Data Indices: " << Capabilities.NumberFeatureDataIndices;
 
     dump = stream.str();
     HidD_FreePreparsedData(PreparsedData);

@@ -41,7 +41,7 @@ DWORD WINAPI CommThreadProc(LPVOID data) {
                     //LOG("  devConnected: %d", (int)devConnected);
                     std::string dump;
                     hidDevice.DumpCapabilities(dump);
-                    LOG("USB HID capabilities: %s\n", dump.c_str());
+                    LOG("USB HID capabilities:\n%s", dump.c_str());
                     ControlQueue::SetInitialState(hidDevice);
                 } else {
                     LOG("Error opening USB device (USB VID 0x%04X, PID 0x%04X, usage page 0x%X): %s",
