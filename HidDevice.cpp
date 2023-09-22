@@ -50,13 +50,13 @@ extern "C"
 using namespace nsHidDevice;
 using namespace std;
 
-#define HID_USAGE_TELEPHONY_HOOK_SWITCH 0x20
-#define HID_USAGE_TELEPHONY_FLASH       0x21
-#define HID_USAGE_TELEPHONY_HOLD        0x23
-#define HID_USAGE_TELEPHONY_REDIAL      0x24
-#define HID_USAGE_TELEPHONY_MUTE        0x2F    // microphone mute
-#define HID_USAGE_TELEPHONY_LINE_BUSY   0x97
-#define HID_USAGE_TELEPHONY_LED_RINGER  0x9E    //?
+#define HID_USAGE_TELEPHONY_HOOK_SWITCH     0x20
+#define HID_USAGE_TELEPHONY_FLASH           0x21
+#define HID_USAGE_TELEPHONY_HOLD            0x23
+#define HID_USAGE_TELEPHONY_REDIAL          0x24
+#define HID_USAGE_TELEPHONY_MUTE            0x2F    // microphone mute
+#define HID_USAGE_TELEPHONY_LINE_BUSY_TONE  0x97
+#define HID_USAGE_TELEPHONY_LED_RINGER      0x9E    //?
 
 HidDevice::SERROR HidDevice::tabErrorsName[E_ERR_LIMIT] =
 {
@@ -271,6 +271,12 @@ int HidDevice::Open(int VID, int PID, char *vendorName, char *productName, int u
                                 bcTelephonyRedial.reportId = caps.ReportID;
                                 bcTelephonyRedial.absolute = caps.IsAbsolute;
                                 LOG("Caps: USAGE_TELEPHONY_REDIAL: reportId = %d, absolute = %d", caps.ReportID, caps.IsAbsolute);
+                                break;
+                            case HID_USAGE_TELEPHONY_LINE_BUSY_TONE:
+                                bcTelephonyLineBusyTone.valid = true;
+                                bcTelephonyLineBusyTone.reportId = caps.ReportID;
+                                bcTelephonyRedial.absolute = caps.IsAbsolute;
+                                LOG("Caps: USAGE_TELEPHONY_LINE_BUSY_TONE: reportId = %d, absolute = %d", caps.ReportID, caps.IsAbsolute);
                                 break;
                             default:
                                 LOG("Caps: Unknown usage 0x%02X: reportId = %d, absolute = %d", usage, caps.ReportID, caps.IsAbsolute);
@@ -686,7 +692,7 @@ int HidDevice::ParseReceivedReport(unsigned char* buffer, int len, bool &offHook
         case HID_USAGE_TELEPHONY_REDIAL:
             redial = true;
             break;
-        case HID_USAGE_TELEPHONY_LINE_BUSY:
+        case HID_USAGE_TELEPHONY_LINE_BUSY_TONE:
             lineBusy = true;
             break;
         default:

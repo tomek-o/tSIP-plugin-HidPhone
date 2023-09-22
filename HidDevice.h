@@ -49,7 +49,8 @@ namespace nsHidDevice {
                 reportId(0xFF),
                 absolute(true)
             {}
-        } bcTelephonyHookSwitch, bcTelephonyMute, bcTelephonyRedial, bcLedOnline, bcLedOffHook, bcLedRing, bcLedMute;
+        } bcTelephonyHookSwitch, bcTelephonyMute, bcTelephonyRedial, bcTelephonyLineBusyTone,
+            bcLedOnline, bcLedOffHook, bcLedRing, bcLedMute;
 
         int CreateReadWriteHandles(std::string path);
 
