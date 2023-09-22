@@ -27,7 +27,7 @@ DWORD WINAPI CommThreadProc(LPVOID data) {
     bool devConnected = false;
     unsigned int loopCnt = 0;
 
-    unsigned char rcvbuf[17];
+    unsigned char rcvbuf[128];
     LOG("Running comm thread");
 
     while (connected) {
@@ -59,6 +59,13 @@ DWORD WINAPI CommThreadProc(LPVOID data) {
             else
             {
                 int size = hidDevice.GetReportInLength(); //sizeof(rcvbuf);
+                assert(size <= static_cast<int>(sizeof(rcvbuf)));
+                if (size > static_cast<int>(sizeof(rcvbuf))) {
+                    LOG("Unexpected: rcvbuf too small!");
+                    hidDevice.Close();
+                    devConnected = false;
+                    continue;
+                }
                 memset(rcvbuf, 0, sizeof(rcvbuf));
                 //LOG("%03d  devConnected: %d, size = %d", __LINE__, (int)devConnected, size);
                 int status = hidDevice.Read(rcvbuf, size, 100);
@@ -89,6 +96,7 @@ DWORD WINAPI CommThreadProc(LPVOID data) {
     if (devConnected)
     {
         // clear state
+        LOG("Clearing state at thread exit");
         ControlQueue::SetOnline(false);
         ControlQueue::SetRing(false);
         ControlQueue::SetCall(false);
