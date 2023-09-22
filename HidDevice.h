@@ -49,7 +49,7 @@ namespace nsHidDevice {
                 reportId(0xFF),
                 absolute(true)
             {}
-        } bcTelephonyHookSwitch, bcTelephonyMute, bcTelephonyRedial, bcTelephonyLineBusyTone,
+        } bcTelephonyHookSwitch, bcTelephonyMute, bcTelephonyRedial, bcTelephonyLineBusyTone, bcTelephonyFlash,
             bcLedOnline, bcLedOffHook, bcLedRing, bcLedMute;
 
         int CreateReadWriteHandles(std::string path);
@@ -148,7 +148,7 @@ namespace nsHidDevice {
             return reportInLength;
         }
 
-        int ParseReceivedReport(unsigned char* buffer, int len, bool &offHook, bool &mute, bool &redial, bool &lineBusy);
+        int ParseReceivedReport(unsigned char* buffer, int len, bool &offHook, bool &mute, bool &redial, bool &lineBusy, bool &flash);
 
         unsigned int GetOffHookSetTimer(void) const {
             return offHookSetTimer;

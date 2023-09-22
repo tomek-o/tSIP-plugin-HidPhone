@@ -29,12 +29,12 @@ void ProcessReceivedReport(nsHidDevice::HidDevice &hidDevice, unsigned char* buf
     if (handled)
         return;
 
-    bool offHook = false, mute = false, redial = false, lineBusy = false;
+    bool offHook = false, mute = false, redial = false, lineBusy = false, flash = false;
 
-    int status = hidDevice.ParseReceivedReport(buffer, size, offHook, mute, redial, lineBusy);
+    int status = hidDevice.ParseReceivedReport(buffer, size, offHook, mute, redial, lineBusy, flash);
     if (status == 0)
     {
-        LOG("Parsed report: offHook %d, mute %d, redial %d, lineBusy %d", offHook, mute, redial, lineBusy);
+        LOG("Parsed report: offHook %d, mute %d, redial %d, lineBusy %d, flash %d", offHook, mute, redial, lineBusy, flash);
         if (offHook)
         {
             unsigned int timer = hidDevice.GetOffHookSetTimer();

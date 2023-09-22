@@ -275,8 +275,14 @@ int HidDevice::Open(int VID, int PID, char *vendorName, char *productName, int u
                             case HID_USAGE_TELEPHONY_LINE_BUSY_TONE:
                                 bcTelephonyLineBusyTone.valid = true;
                                 bcTelephonyLineBusyTone.reportId = caps.ReportID;
-                                bcTelephonyRedial.absolute = caps.IsAbsolute;
+                                bcTelephonyLineBusyTone.absolute = caps.IsAbsolute;
                                 LOG("Caps: USAGE_TELEPHONY_LINE_BUSY_TONE: reportId = %d, absolute = %d", caps.ReportID, caps.IsAbsolute);
+                                break;
+                            case HID_USAGE_TELEPHONY_FLASH:
+                                bcTelephonyFlash.valid = true;
+                                bcTelephonyFlash.reportId = caps.ReportID;
+                                bcTelephonyFlash.absolute = caps.IsAbsolute;
+                                LOG("Caps: USAGE_TELEPHONY_FLASH: reportId = %d, absolute = %d", caps.ReportID, caps.IsAbsolute);
                                 break;
                             default:
                                 LOG("Caps: Unknown usage 0x%02X: reportId = %d, absolute = %d", usage, caps.ReportID, caps.IsAbsolute);
@@ -662,12 +668,13 @@ int HidDevice::Read(unsigned char *buffer, int &len, int timeout)
     }
 }
 
-int HidDevice::ParseReceivedReport(unsigned char* buffer, int len, bool &offHook, bool &mute, bool &redial, bool &lineBusy)
+int HidDevice::ParseReceivedReport(unsigned char* buffer, int len, bool &offHook, bool &mute, bool &redial, bool &lineBusy, bool &flash)
 {
     offHook = false;
     mute = false;
     redial = false;
     lineBusy = false;
+    flash = false;
 
 	USAGE usageList[16];
 	ULONG usageCount = sizeof(usageList)/sizeof(usageList[0]);
@@ -694,6 +701,9 @@ int HidDevice::ParseReceivedReport(unsigned char* buffer, int len, bool &offHook
             break;
         case HID_USAGE_TELEPHONY_LINE_BUSY_TONE:
             lineBusy = true;
+            break;
+        case HID_USAGE_TELEPHONY_FLASH:
+            flash = true;
             break;
         default:
             LOG("Received unhandled usage = %d", static_cast<int>(usageList[i]));
