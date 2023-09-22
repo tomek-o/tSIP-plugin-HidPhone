@@ -26,6 +26,7 @@ CustomSettings::CustomSettings(void):
     }
 #endif
 
+#if 0
     {
         // answer/hangup button
         struct ReportAction ra;
@@ -36,14 +37,23 @@ CustomSettings::CustomSettings(void):
             "Hangup()";
         reportActions.push_back(ra);
     }
+#endif
 
-    scriptOffHook =
+    scriptOffHookToggle =
             "local callState = GetCallState()\r\n"
             "if callState == 1 then\t-- INCOMING\r\n"
             "\tAnswer()\r\n"
             "else\r\n"
             "\tHangup()\r\n"
             "end";
+
+    scriptOffHook1 =
+            "local callState = GetCallState()\r\n"
+            "if callState == 1 then\t-- INCOMING\r\n"
+            "\tAnswer()\r\n"
+            "end";
+
+    scriptOffHook0 = "Hangup()\r\n";
 }
 
 void CustomSettings::fromJson(const Json::Value &jv)
@@ -79,7 +89,14 @@ void CustomSettings::fromJson(const Json::Value &jv)
         }
     }
 
-    jv.getString("scriptOffHook", scriptOffHook);
+    jv.getString("scriptOffHookToggle", scriptOffHookToggle);
+    jv.getString("scriptOffHook1", scriptOffHook1);
+    jv.getString("scriptOffHook0", scriptOffHook0);
+
+    jv.getString("scriptMuteToggle", scriptMuteToggle);
+    jv.getString("scriptMute1", scriptMute1);
+    jv.getString("scriptMute0", scriptMute0);
+
 }
 
 void CustomSettings::toJson(Json::Value &jv) const
@@ -105,5 +122,12 @@ void CustomSettings::toJson(Json::Value &jv) const
         }
     }
 
-    jv["scriptOffHook"] = scriptOffHook;
+    jv["scriptOffHookToggle"] = scriptOffHookToggle;
+    jv["scriptOffHook1"] = scriptOffHook1;
+    jv["scriptOffHook0"] = scriptOffHook0;
+
+    jv["scriptMuteToggle"] = scriptMuteToggle;
+    jv["scriptMute1"] = scriptMute1;
+    jv["scriptMute0"] = scriptMute0;
+
 }

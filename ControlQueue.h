@@ -15,6 +15,8 @@ namespace ControlQueue
 
     int Poll(nsHidDevice::HidDevice &dev);
     int SetInitialState(nsHidDevice::HidDevice &dev);
+
+    bool GetRing(void);
 }
 
 #endif // ControlQueueH

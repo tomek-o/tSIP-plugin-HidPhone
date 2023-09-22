@@ -161,3 +161,8 @@ int ControlQueue::SetInitialState(nsHidDevice::HidDevice &dev)
     return status;
 }
 
+bool ControlQueue::GetRing(void)
+{
+    return ringState;
+}
+

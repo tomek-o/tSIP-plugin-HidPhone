@@ -27,7 +27,13 @@ public:
     int usbUsagePage;
     bool logReceivedHidReports;
     std::vector<ReportAction> reportActions;
-    std::string scriptOffHook;
+    std::string scriptOffHookToggle;
+    std::string scriptOffHook1;
+    std::string scriptOffHook0;
+
+    std::string scriptMuteToggle;
+    std::string scriptMute1;
+    std::string scriptMute0;
 };
 
 extern CustomSettings customSettings;

@@ -153,6 +153,14 @@ namespace nsHidDevice {
         unsigned int GetOffHookSetTimer(void) const {
             return offHookSetTimer;
         }
+
+        const ButtonCapEntry& GetBcTelephonyHookSwitch(void) const {
+            return bcTelephonyHookSwitch;
+        }
+
+        const ButtonCapEntry& GetBcTelephonyMute(void) const {
+            return bcTelephonyMute;
+        }
     };
 
 };
