@@ -5,6 +5,11 @@
 #include "Log.h"
 #include <string.h>
 
+/**
+Handling strange Gigaset ION behavior: when answering incoming call first report does not contain
+offHook usage (or is just lineBusy in response to ring?), second one does. With this flag two reports without offHook are required.
+This is not breaking Jabra Evolve 65 interoperability.
+*/
 static bool callReject = false;
 
 int RunScriptAsync(const char* script);
