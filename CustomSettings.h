@@ -34,6 +34,8 @@ public:
     std::string scriptMuteToggle;
     std::string scriptMute1;
     std::string scriptMute0;
+
+    bool controlMuteLed;
 };
 
 extern CustomSettings customSettings;

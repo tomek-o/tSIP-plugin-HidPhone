@@ -8,7 +8,8 @@ CustomSettings::CustomSettings(void):
     usbVid(0x0000),
     usbPid(0x0000),
     usbUsagePage(0xb),
-    logReceivedHidReports(true)
+    logReceivedHidReports(true),
+    controlMuteLed(true)
 {
 #if 0
     {
@@ -97,6 +98,7 @@ void CustomSettings::fromJson(const Json::Value &jv)
     jv.getString("scriptMute1", scriptMute1);
     jv.getString("scriptMute0", scriptMute0);
 
+    jv.getBool("controlMuteLed", controlMuteLed);
 }
 
 void CustomSettings::toJson(Json::Value &jv) const
@@ -130,4 +132,5 @@ void CustomSettings::toJson(Json::Value &jv) const
     jv["scriptMute1"] = scriptMute1;
     jv["scriptMute0"] = scriptMute0;
 
+    jv["controlMuteLed"] = controlMuteLed;
 }

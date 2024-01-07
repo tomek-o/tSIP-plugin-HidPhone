@@ -154,12 +154,24 @@ int SetRegistrationState(int state) {
 }
 
 int SetCallState(int state, const char* display) {
+    if (state == 0) {
+        if (customSettings.controlMuteLed) {
+            ControlQueue::SetMute(false);
+        }
+    }
     ControlQueue::SetCall(state);
     return 0;
 }
 
 int Ring(int state) {
     ControlQueue::SetRing(state);
+    return 0;
+}
+
+int SetMuteState(unsigned int callUid, int state) {
+    if (customSettings.controlMuteLed) {
+        ControlQueue::SetMute(state);
+    }
     return 0;
 }
 
