@@ -531,12 +531,20 @@ int HidDevice::WriteUsage(USAGE usage, bool state)
 
     NTSTATUS status;
 
-    if (state)
+    if (state || usage == HID_USAGE_LED_MUTE)
     {
         USAGE usagePageForSetUsages = HID_USAGE_PAGE_LED;
-        USAGE usageList[1];
-        usageList[0] = usage;
-        unsigned long usageCount = 1;
+        USAGE usageList[2];
+        unsigned long usageCount = 0;
+        if (state)
+        {
+            usageList[usageCount++] = usage;
+        }
+
+        if (usage == HID_USAGE_LED_MUTE)
+        {
+            usageList[usageCount++] = HID_USAGE_LED_OFF_HOOK;
+        }
 
         status = HidP_SetUsages(HidP_Output, usagePageForSetUsages, 0, usageList, &usageCount, preparsedData, report, reportOutLength);
         if (status != HIDP_STATUS_SUCCESS)
