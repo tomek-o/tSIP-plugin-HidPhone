@@ -17,6 +17,10 @@ namespace ControlQueue
     int SetInitialState(nsHidDevice::HidDevice &dev);
 
     bool GetRing(void);
+    bool GetOnline(void);
+    bool GetCall(void);
+    bool GetMute(void);
+    bool GetOffHook(void);
 }
 
 #endif // ControlQueueH

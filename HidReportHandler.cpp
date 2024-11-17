@@ -10,7 +10,11 @@ Handling strange Gigaset ION behavior: when answering incoming call first report
 offHook usage (or is just lineBusy in response to ring?), second one does. With this flag two reports without offHook are required.
 This is not breaking Jabra Evolve 65 interoperability.
 */
+
 static bool callReject = false;
+static bool stateOffHook = false;
+//static bool stateMute = false;
+
 
 int RunScriptAsync(const char* script);
 
@@ -43,46 +47,64 @@ void ProcessReceivedReport(nsHidDevice::HidDevice &hidDevice, unsigned char* buf
     if (status == 0)
     {
         LOG("Parsed report: offHook %d, mute %d, redial %d, lineBusy %d, flash %d", offHook, mute, redial, lineBusy, flash);
-        if (offHook)
+        if (offHook != stateOffHook)
         {
-            if (hidDevice.GetBcTelephonyHookSwitch().absolute == false)
+            if (offHook)
             {
-                unsigned int timer = hidDevice.GetOffHookSetTimer();
-                if (timer == 0)
+                if (hidDevice.GetBcTelephonyHookSwitch().absolute == false)
                 {
-                    LOG("Running offHookToggle script");
-                    RunScriptAsync(customSettings.scriptOffHookToggle.c_str());
+                    callReject = false;
+                    unsigned int timer = hidDevice.GetOffHookSetTimer();
+                    if (timer == 0)
+                    {
+                        LOG("Running offHookToggle script");
+                        RunScriptAsync(customSettings.scriptOffHookToggle.c_str());
+                    }
+                    else
+                    {
+                        LOG("Ignoring offHook script, timer = %u", timer);
+                    }
                 }
                 else
                 {
-                    LOG("Ignoring offHook script, timer = %u", timer);
+                    if (stateOffHook == ControlQueue::GetOffHook())
+                    {
+                        LOG("Running offHook1 script");
+                        RunScriptAsync(customSettings.scriptOffHook1.c_str());
+                    }
                 }
             }
             else
             {
-                LOG("Running offHook1 script");
-                RunScriptAsync(customSettings.scriptOffHook1.c_str());
+                if (hidDevice.GetBcTelephonyHookSwitch().absolute)
+                {
+                    if (stateOffHook == ControlQueue::GetOffHook())
+                    {
+                        LOG("Running offHook0 script");
+                        RunScriptAsync(customSettings.scriptOffHook0.c_str());
+                    }
+                }
             }
-            callReject = false;
+            stateOffHook = offHook;
         }
         else
         {
-            if (hidDevice.GetBcTelephonyHookSwitch().absolute)
+            //LOG("Value of offHook not changed");
+            if (offHook == false && ControlQueue::GetRing())
             {
-                if (ControlQueue::GetRing() == false) {
+                if (callReject == false)
+                {
+                    callReject = true;
+                }
+                else
+                {
                     LOG("Running offHook0 script");
                     RunScriptAsync(customSettings.scriptOffHook0.c_str());
-                    callReject = false;
-                } else {
-                    if (callReject) {
-                        LOG("Running offHook0 script for call reject");
-                        RunScriptAsync(customSettings.scriptOffHook0.c_str());
-                        callReject = false;
-                    } else {
-                        LOG("Delaying offHook0 script - setting call reject flag");
-                        callReject = true;
-                    }
                 }
+            }
+            else
+            {
+                callReject = false;
             }
         }
 

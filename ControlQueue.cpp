@@ -1,5 +1,6 @@
 #include "ControlQueue.h"
 #include "HidDevice.h"
+#include "HidReportHandler.h"
 #include "Log.h"
 #include "ScopedLock.h"
 #include "Mutex.h"
@@ -9,10 +10,10 @@ namespace {
 
 Mutex mutex;
 
-int onlineState = 0;
-int callState = 0;
-int ringState = 0;
-int muteState = 0;
+bool onlineState = 0;
+bool callState = 0;
+bool ringState = 0;
+bool muteState = 0;
 
 struct Command
 {
@@ -108,7 +109,9 @@ int ControlQueue::Poll(nsHidDevice::HidDevice &dev)
                 status = dev.WriteUsage(HID_USAGE_LED_OFF_HOOK, callState);
                 if (status)
                     return status;
-            } else {
+            }
+            else
+            {
                 status = dev.WriteUsage(HID_USAGE_LED_RING, ringState);
                 if (status)
                     return status;
@@ -164,5 +167,25 @@ int ControlQueue::SetInitialState(nsHidDevice::HidDevice &dev)
 bool ControlQueue::GetRing(void)
 {
     return ringState;
+}
+
+bool ControlQueue::GetOnline(void)
+{
+    return onlineState;
+}
+
+bool ControlQueue::GetCall(void)
+{
+    return callState;
+}
+
+bool ControlQueue::GetMute(void)
+{
+    return muteState;
+}
+
+bool ControlQueue::GetOffHook(void)
+{
+    return callState && !ringState;
 }
 
